@@ -590,7 +590,7 @@ class CPU {
             case 0xCF:
                 return RST(0x0008);
             case 0xD0:
-                return RET_CON(!carry);
+                return RET_CON(!zero);
             case 0xD1:
                 return POP_RR("de");
             case 0xD2:
@@ -1730,7 +1730,7 @@ class CPU {
         carry = false;
         UpdateFFromFlags();
 
-        A = (byte)val;
+        A = (byte)result;
         return 8;
     }
 
