@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- Pack-ready metadata (optional) -->
+    <PackageId>CODE-DMG.Core</PackageId>
+    <RootNamespace>CODE_DMG</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Keep Newtonsoft.Json only if core actually needs it. Otherwise we can remove in a follow-up. -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+</Project>
