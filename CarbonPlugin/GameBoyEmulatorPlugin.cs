@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+using Oxide.Game.Rust.Cui;
 
 // Carbon supports Oxide-compatible plugins; Carbon-only plugins can inherit CarbonPlugin.
 // Docs: https://carbonmod.gg/devs/creating-your-first-plugin
@@ -243,13 +244,13 @@ namespace Carbon.Plugins
 
             // Build UI with standard CUI primitives for maximum compatibility.
             // Carbon LUI is a wrapper around CUI; this overlay works in Carbon and can be migrated to LUI updates if desired.
-            var container = new Oxide.Game.Rust.Cui.CuiElementContainer();
+            var container = new CuiElementContainer();
 
             session.UiPanelName = UiRoot;
             session.UiImageName = UiRoot + ".img";
             session.UiLabelName = UiRoot + ".lbl";
 
-            container.Add(new Oxide.Game.Rust.Cui.CuiPanel
+            container.Add(new CuiPanel
             {
                 Image = { Color = _config.UiBackgroundColor },
                 RectTransform =
@@ -260,49 +261,49 @@ namespace Carbon.Plugins
                 CursorEnabled = true
             }, "Overlay", session.UiPanelName);
 
-            container.Add(new Oxide.Game.Rust.Cui.CuiLabel
+            container.Add(new CuiLabel
             {
                 Text = { Text = "GameBoy", FontSize = 12, Align = TextAnchor.UpperCenter, Color = "1 1 1 1" },
                 RectTransform = { AnchorMin = "0 0.92", AnchorMax = "1 1" }
             }, session.UiPanelName, session.UiLabelName);
 
             // placeholder image; updated each UI refresh
-            container.Add(new Oxide.Game.Rust.Cui.CuiElement
+            container.Add(new CuiElement
             {
                 Name = session.UiImageName,
                 Parent = session.UiPanelName,
                 Components =
                 {
-                    new Oxide.Game.Rust.Cui.CuiRawImageComponent { Png = "", Color = "1 1 1 1" },
-                    new Oxide.Game.Rust.Cui.CuiRectTransformComponent { AnchorMin = "0.03 0.03", AnchorMax = "0.97 0.90" }
+                    new CuiRawImageComponent { Png = "", Color = "1 1 1 1" },
+                    new CuiRectTransformComponent { AnchorMin = "0.03 0.03", AnchorMax = "0.97 0.90" }
                 }
             });
 
-            Oxide.Game.Rust.Cui.CuiHelper.AddUi(session.Player, container);
+            CuiHelper.AddUi(session.Player, container);
         }
 
         private void UpdateUi(Session session)
         {
             var pngBytes = FramebufferToPng(session.Ppu.Framebuffer);
-            var pngId = FileStorage.server.Store(pngBytes, FileStorage.Type.png, 0u);
+            var pngId = FileStorage.server.Store(pngBytes, FileStorage.Type.png, CommunityEntity.ServerInstance.net.ID);
 
             // Replace image in UI by rebuilding only the raw image element.
             // (Simple + reliable; can be optimized later with LUI updates.)
-            var container = new Oxide.Game.Rust.Cui.CuiElementContainer();
-            container.Add(new Oxide.Game.Rust.Cui.CuiElement
+            var container = new CuiElementContainer();
+            container.Add(new CuiElement
             {
                 Name = session.UiImageName,
                 Parent = session.UiPanelName,
                 Components =
                 {
-                    new Oxide.Game.Rust.Cui.CuiRawImageComponent { Png = pngId.ToString(), Color = "1 1 1 1" },
-                    new Oxide.Game.Rust.Cui.CuiRectTransformComponent { AnchorMin = "0.03 0.03", AnchorMax = "0.97 0.90" }
+                    new CuiRawImageComponent { Png = pngId.ToString(), Color = "1 1 1 1" },
+                    new CuiRectTransformComponent { AnchorMin = "0.03 0.03", AnchorMax = "0.97 0.90" }
                 }
             });
 
             // Remove old element with the same name then add updated one.
-            Oxide.Game.Rust.Cui.CuiHelper.DestroyUi(session.Player, session.UiImageName);
-            Oxide.Game.Rust.Cui.CuiHelper.AddUi(session.Player, container);
+            CuiHelper.DestroyUi(session.Player, session.UiImageName);
+            CuiHelper.AddUi(session.Player, container);
 
             session.LastPngId = pngId;
         }
@@ -310,7 +311,7 @@ namespace Carbon.Plugins
         private void DestroyUi(BasePlayer player)
         {
             if (player == null) return;
-            Oxide.Game.Rust.Cui.CuiHelper.DestroyUi(player, UiRoot);
+            CuiHelper.DestroyUi(player, UiRoot);
         }
 
         private static void ApplyJoypad(MMU mmu, string button, bool pressed)
